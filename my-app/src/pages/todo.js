@@ -15,19 +15,36 @@ import {
   Paper,
 } from "@mui/material";
 import { Delete } from "@mui/icons-material";
-import { fetchTasks, createTask } from "../services/TaskService";
+import { fetchTasks, createTask } from "../services/taskService";
+import { login, logout, getCurrentUser } from "../services/authService";
 
-function App() {
+function TodoList() {
   const [tasks, setTasks] = useState([]);
   const [input, setInput] = useState("");
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const loadTasks = async () => {
-      const tasks = await fetchTasks();
-      setTasks(tasks);
+    // Fetch user data if logged in
+    const initializeUser = async () => {
+      const currentUser = await getCurrentUser();
+      if (currentUser) {
+        setUser(currentUser);
+        const fetchedTasks = await fetchTasks();
+        setTasks(fetchedTasks);
+      }
     };
-    loadTasks();
+    initializeUser();
   }, []);
+
+  const handleLogin = () => {
+    login();
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    setUser(null);
+    setTasks([]);
+  };
 
   const handleChange = (e) => setInput(e.target.value);
 
@@ -66,48 +83,63 @@ function App() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             To-Do List
           </Typography>
+          {user ? (
+            <Button color="inherit" onClick={handleLogout}>
+              Logout
+            </Button>
+          ) : (
+            <Button color="inherit" onClick={handleLogin}>
+              Login
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
 
       <Paper elevation={3} sx={{ padding: "20px", marginTop: "20px" }}>
         <Typography variant="h5" align="center" gutterBottom>
-          My Tasks
+          {user ? `Welcome, ${user.username}` : "My Tasks"}
         </Typography>
-        <TextField
-          label="Add a new task"
-          variant="outlined"
-          fullWidth
-          value={input}
-          onChange={handleChange}
-          onKeyPress={(e) => e.key === "Enter" && addTask()}
-          sx={{ marginBottom: "20px" }}
-        />
-        <Button variant="contained" color="primary" fullWidth onClick={addTask}>
-          Add Task
-        </Button>
+        {user && (
+          <>
+            <TextField
+              label="Add a new task"
+              variant="outlined"
+              fullWidth
+              value={input}
+              onChange={handleChange}
+              onKeyPress={(e) => e.key === "Enter" && addTask()}
+              sx={{ marginBottom: "20px" }}
+            />
+            <Button variant="contained" color="primary" fullWidth onClick={addTask}>
+              Add Task
+            </Button>
+          </>
+        )}
       </Paper>
 
-      <List sx={{ marginTop: "20px" }}>
-        {tasks.map((task, index) => (
-          <ListItem key={task.id} disableGutters divider>
-            <Checkbox
-              checked={task.isCompleted}
-              onChange={() => toggleCompletion(index)}
-            />
-            <ListItemText
-              primary={task.text}
-              style={{ textDecoration: task.isCompleted ? "line-through" : "none" }}
-            />
-            <ListItemSecondaryAction>
-              <IconButton edge="end" onClick={() => handleDelete(index)}>
-                <Delete color="secondary" />
-              </IconButton>
-            </ListItemSecondaryAction>
-          </ListItem>
-        ))}
-      </List>
+      {user && (
+        <List sx={{ marginTop: "20px" }}>
+          {tasks.map((task, index) => (
+            <ListItem key={task.id} disableGutters divider>
+              <Checkbox
+                checked={task.isCompleted}
+                onChange={() => toggleCompletion(index)}
+              />
+              <ListItemText
+                primary={task.text}
+                style={{ textDecoration: task.isCompleted ? "line-through" : "none" }}
+              />
+              <ListItemSecondaryAction>
+                <IconButton edge="end" onClick={() => handleDelete(index)}>
+                  <Delete color="secondary" />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))}
+        </List>
+      )}
     </Container>
   );
 }
 
-export default App;
+export default TodoList;
