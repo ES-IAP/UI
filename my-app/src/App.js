@@ -1,14 +1,14 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import HomePage from './pages/HomePage';
+import { Routes, Route } from 'react-router-dom';
+import TodoList from './pages/todo';
 
 function App() {
   return (
-    <Router>
+    <div className="App">
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<TodoList />} />
       </Routes>
-    </Router>
+    </div>
   );
 }
 
