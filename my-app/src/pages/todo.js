@@ -15,7 +15,7 @@ import {
     Paper,
 } from "@mui/material";
 import { Delete } from "@mui/icons-material";
-import { fetchTasks, createTask } from "../services/taskService";
+import { fetchTasks, createTask, deleteTask } from "../services/taskService";
 import { login, logout, getCurrentUser } from "../services/authService";
 
 function TodoList() {
@@ -76,10 +76,9 @@ function TodoList() {
     };
 
     const handleDelete = async (index) => {
-        console.log("Delete task at index", index);
-        // const task = tasks[index];
-        // await deleteTask(task.id);
-        // setTasks(tasks.filter((_, i) => i !== index));
+        const task = tasks[index];
+        await deleteTask(task.id);
+        setTasks(tasks.filter((_, i) => i !== index));
     };
 
     return (
