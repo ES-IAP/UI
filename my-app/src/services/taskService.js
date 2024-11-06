@@ -26,3 +26,13 @@ export const createTask = async (task) => {
     return null;
   }
 };
+
+export const deleteTask = async (taskId) => {
+  try {
+    const response = await axios.delete(`${API_URL}/tasks/${taskId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    return null;
+  }
+}

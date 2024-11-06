@@ -15,8 +15,10 @@ import {
     Paper,
 } from "@mui/material";
 import { Delete } from "@mui/icons-material";
-import { fetchTasks, createTask } from "../services/taskService";
+import { fetchTasks, createTask, deleteTask } from "../services/taskService";
 import { login, logout, getCurrentUser } from "../services/authService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function TodoList() {
     const [tasks, setTasks] = useState([]);
@@ -76,10 +78,10 @@ function TodoList() {
     };
 
     const handleDelete = async (index) => {
-        console.log("Delete task at index", index);
-        // const task = tasks[index];
-        // await deleteTask(task.id);
-        // setTasks(tasks.filter((_, i) => i !== index));
+        const task = tasks[index];
+        await deleteTask(task.id);
+        setTasks(tasks.filter((_, i) => i !== index));
+        toast.success("Task deleted successfully!");
     };
 
     return (
@@ -145,6 +147,8 @@ function TodoList() {
                     ))}
                 </List>
             )}
+            
+            <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
         </Container>
     );
 }
