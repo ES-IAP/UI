@@ -36,3 +36,15 @@ export const deleteTask = async (taskId) => {
     return null;
   }
 }
+
+export const updateTaskStatus = async (taskId) => {
+  try {
+      const response = await axios.put(`${API_URL}/task/${taskId}`);
+      return response.data;
+  } catch (error) {
+      console.error("Error updating task status:", error);
+      throw error;
+  }
+};
+
+

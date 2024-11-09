@@ -28,11 +28,13 @@ function TodoList() {
             if (currentUser) {
                 setUser(currentUser);
                 const fetchedTasks = await fetchTasks();
+                console.log("Fetched Tasks:", fetchedTasks); // Check the structure here
                 setTasks(fetchedTasks);
             }
         };
         initializeUser();
     }, []);
+    
 
     const handleLogout = async () => {
         await logout();
@@ -140,6 +142,7 @@ function TodoList() {
             <div className="task-table">
                 <TaskTable
                     tasks={tasks}
+                    setTasks={setTasks}
                     handleDelete={handleDelete}
                     setPriority={handleSetPriority}
                     setStatus={handleSetStatus}
