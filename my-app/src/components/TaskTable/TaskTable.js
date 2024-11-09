@@ -14,12 +14,26 @@ import {
     Box
 } from "@mui/material";
 import { CheckCircle, Delete } from "@mui/icons-material";
+import { updateTaskStatus } from "../../services/taskService";
 
 // Update the options according to your backend enum values
 const priorityOptions = ["low", "medium", "high"];
 const statusOptions = ["to-do", "in progress", "done"];
 
-function TaskTable({ tasks, handleDelete, setPriority, setStatus }) {
+function TaskTable({ tasks, setTasks, handleDelete, setPriority, setStatus }) {
+
+    async function handleToggleStatus(taskId) {
+        try {
+            await updateTaskStatus(taskId); // Call backend to mark task as done
+            const updatedTasks = tasks.map((task) =>
+                task.id === taskId ? { ...task, status: 'done' } : task
+            );
+            setTasks(updatedTasks); // Update UI
+        } catch (error) {
+            console.error("Failed to update task status:", error);
+        }
+    }    
+
 
     return (
         <TableContainer
@@ -145,14 +159,16 @@ function TaskTable({ tasks, handleDelete, setPriority, setStatus }) {
                             <TableCell>
                                 <Box sx={{ display: 'flex', gap: 1 }}>
                                     <IconButton
-                                    // onClick={() => setStatus(index, "done")}
-                                    // sx={{
-                                    //     color: task.status === 'done' ? '#52c41a' : '#d9d9d9',
-                                    //     '&:hover': { color: '#52c41a' }
-                                    // }}
+                                        onClick={() => handleToggleStatus(task.id)}
+                                        sx={{
+                                            color: task.status === 'done' ? '#52c41a' : '#d9d9d9',
+                                            '&:hover': { color: '#52c41a' }
+                                        }}
                                     >
                                         <CheckCircle />
                                     </IconButton>
+
+
                                     <IconButton
                                         onClick={() => handleDelete(index)}
                                         sx={{
