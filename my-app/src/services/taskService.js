@@ -8,7 +8,7 @@ axios.defaults.withCredentials = true; // Include credentials for Cognito or oth
 // Fetch tasks for the logged-in user
 export const fetchTasks = async () => {
   try {
-    const response = await axios.get(`${API_URL}/tasks`);
+    const response = await axios.get(`${API_URL}/tasks`, { withCredentials: true });
     return response.data;
   } catch (error) {
     console.error("Error fetching tasks:", error);
@@ -19,7 +19,7 @@ export const fetchTasks = async () => {
 // Create a new task for the logged-in user
 export const createTask = async (task) => {
   try {
-    const response = await axios.post(`${API_URL}/tasks`, task);
+    const response = await axios.post(`${API_URL}/tasks`, task, { withCredentials: true });
     return response.data;
   } catch (error) {
     console.error("Error creating task:", error);

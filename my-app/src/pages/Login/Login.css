@@ -1,0 +1,16 @@
+/* Login.css */
+
+.centered-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+    text-align: center;
+    margin: auto;
+}
+
+.login-button {
+    margin-top: 20px;
+    width: 200px; /* Consistent button width */
+}
