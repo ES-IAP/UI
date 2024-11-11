@@ -47,4 +47,13 @@ export const updateTaskStatus = async (taskId) => {
   }
 };
 
+export const updateTask = async (task) => {
+  try {
+    const response = await axios.put(`${API_URL}/tasks/${task.id}`, task, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating task:", error);
+    throw error;
+  }
+};
 
