@@ -13,14 +13,14 @@ import {
     MenuItem,
     Box
 } from "@mui/material";
-import { CheckCircle, Delete } from "@mui/icons-material";
+import { CheckCircle, Delete, Edit } from "@mui/icons-material";
 import { updateTaskStatus } from "../../services/taskService";
 
 // Update the options according to your backend enum values
 const priorityOptions = ["low", "medium", "high"];
 const statusOptions = ["to-do", "in progress", "done"];
 
-function TaskTable({ tasks, setTasks, handleDelete, setPriority, setStatus }) {
+function TaskTable({ tasks, setTasks, handleDelete, handleEdit, setPriority, setStatus }) {
 
     async function handleToggleStatus(taskId) {
         try {
@@ -167,8 +167,9 @@ function TaskTable({ tasks, setTasks, handleDelete, setPriority, setStatus }) {
                                     >
                                         <CheckCircle />
                                     </IconButton>
-
-
+                                    <IconButton onClick={() => handleEdit(task)}>
+                                        <Edit />
+                                    </IconButton>
                                     <IconButton
                                         onClick={() => handleDelete(index)}
                                         sx={{

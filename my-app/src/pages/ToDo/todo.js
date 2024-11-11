@@ -5,7 +5,7 @@ import { Add, Logout } from "@mui/icons-material"
 import AppBarComponent from "../../components/AppBar/AppBarComponent";
 import TaskTable from "../../components/TaskTable/TaskTable";
 import TaskModal from "../../components/TaskModal/TaskModal";
-import { fetchTasks, createTask, deleteTask } from "../../services/taskService";
+import { fetchTasks, createTask, deleteTask, updateTask } from "../../services/taskService";
 import { logout, getCurrentUser } from "../../services/authService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,6 +14,8 @@ function TodoList() {
     const [tasks, setTasks] = useState([]);
     const [user, setUser] = useState(null);
     const [open, setOpen] = useState(false);
+    const [taskToEdit, setTaskToEdit] = useState(null);  // Track task being edited
+
 
     // State for TaskModal fields
     const [title, setTitle] = useState("");
@@ -97,6 +99,36 @@ function TodoList() {
         toast.success("Task deleted successfully!");
     };
 
+    const handleEditTask = (task) => {
+        setTaskToEdit(task);  // Set task to be edited
+        setTitle(task.title);
+        setDescription(task.description);
+        setPriority(task.priority);
+        setDeadline(task.deadline ? new Date(task.deadline).toISOString().split("T")[0] : "");
+        setOpen(true);
+    };
+
+    const handleSaveTask = async () => {
+        const updatedTask = {
+            ...taskToEdit,
+            title,
+            description,
+            priority,
+            deadline: deadline ? new Date(deadline).toISOString() : null
+        };
+
+        try {
+            const savedTask = await updateTask(updatedTask);  // Call update service
+            setTasks(tasks.map((task) => (task.id === savedTask.id ? savedTask : task)));
+            setTaskToEdit(null);
+            handleClose();
+            toast.success("Task updated successfully!");
+        } catch (error) {
+            console.error("Error updating task:", error);
+            toast.error("Failed to update task.");
+        }
+    };
+
     return (
         <Container>
             <div className="min-h-screen bg-gray-50">
@@ -137,7 +169,7 @@ function TodoList() {
                 setPriority={setPriority}
                 deadline={deadline}
                 setDeadline={setDeadline}
-                handleAddTask={handleAddTask}
+                handleAddTask={taskToEdit ? handleSaveTask : handleAddTask}  // Switch between add and edit modes
             />
             <div className="task-table">
                 <TaskTable
@@ -146,6 +178,7 @@ function TodoList() {
                     handleDelete={handleDelete}
                     setPriority={handleSetPriority}
                     setStatus={handleSetStatus}
+                    handleEdit={handleEditTask}  // Pass edit handler
                 />
             </div>
             <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
