@@ -5,7 +5,7 @@ import { Add, Logout } from "@mui/icons-material"
 import AppBarComponent from "../../components/AppBar/AppBarComponent";
 import TaskTable from "../../components/TaskTable/TaskTable";
 import TaskModal from "../../components/TaskModal/TaskModal";
-import { fetchTasks, createTask, deleteTask, updateTask } from "../../services/taskService";
+import { fetchTasks, createTask, deleteTask, updateTask, updateTaskStatus } from "../../services/taskService";
 import { logout, getCurrentUser } from "../../services/authService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -55,21 +55,41 @@ function TodoList() {
 
     };
 
-    const handleSetPriority = (index, newPriority) => {
-        const updatedTasks = tasks.map((task, i) =>
-            i === index ? { ...task, priority: newPriority } : task
-        );
-        setTasks(updatedTasks);
+    const handleSetPriority = async (index, newPriority) => {
+        const task = tasks[index];
+        try {
+            const updatedTask = await updateTask(task.id, { priority: newPriority });
+            const updatedTasks = tasks.map((t) =>
+                t.id === task.id ? { ...t, priority: updatedTask.priority } : t
+            );
+            setTasks(updatedTasks);
+        } catch (error) {
+            console.error("Failed to update task priority:", error);
+        }
     };
     
-    const handleSetStatus = (index, newStatus) => {
-        const updatedTasks = tasks.map((task, i) =>
-            i === index ? { ...task, status: newStatus } : task
-        );
-        setTasks(updatedTasks);
-    };
+    
+    const handleSetStatus = async (index, newStatus) => {
+        const task = tasks[index];
+        try {
+            const updatedTask = await updateTask(task.id, { status: newStatus });
+            const updatedTasks = tasks.map((t) =>
+                t.id === task.id ? { ...t, status: updatedTask.status } : t
+            );
+            setTasks(updatedTasks);
+        } catch (error) {
+            console.error("Failed to update task status:", error);
+        }
+    };  
 
     const handleAddTask = async () => {
+        const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+
+        if (deadline && deadline < today) {
+            toast.error("Deadline must be today or a future date.");
+            return;
+        }
+
         const newTask = {
             title,
             description,
@@ -94,9 +114,16 @@ function TodoList() {
 
     const handleDelete = async (index) => {
         const task = tasks[index];
-        await deleteTask(task.id);
-        setTasks(tasks.filter((_, i) => i !== index));
-        toast.success("Task deleted successfully!");
+        try {
+            await deleteTask(task.id); // Call the API
+            // If the API call is successful, update the UI and show success toast
+            setTasks(tasks.filter((_, i) => i !== index));
+            toast.success("Task deleted successfully!");
+        } catch (error) {
+            // If an error occurs, log it and show an error toast
+            console.error("Error deleting task:", error.response?.data || error.message);
+            toast.error("Failed to delete task. Please try again.");
+        }
     };
 
     const handleEditTask = (task) => {
@@ -109,16 +136,22 @@ function TodoList() {
     };
 
     const handleSaveTask = async () => {
-        const updatedTask = {
-            ...taskToEdit,
+        const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+
+        if (deadline && deadline < today) {
+            toast.error("Deadline must be today or a future date.");
+            return;
+        }
+        
+        const updates = {
             title,
             description,
             priority,
-            deadline: deadline ? new Date(deadline).toISOString() : null
+            deadline: deadline ? new Date(deadline).toISOString() : null,
         };
-
+    
         try {
-            const savedTask = await updateTask(updatedTask);  // Call update service
+            const savedTask = await updateTask(taskToEdit.id, updates); // Pass only updated fields
             setTasks(tasks.map((task) => (task.id === savedTask.id ? savedTask : task)));
             setTaskToEdit(null);
             handleClose();

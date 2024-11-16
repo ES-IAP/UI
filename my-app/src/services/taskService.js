@@ -3,7 +3,7 @@ import axios from "axios";
 // Replace with your backend's base URL
 const API_URL = "http://localhost:8000";
 
-axios.defaults.withCredentials = true; // Include credentials for Cognito or other auth
+axios.defaults.withCredentials = true; // Include credentials for Cognito
 
 // Fetch tasks for the logged-in user
 export const fetchTasks = async () => {
@@ -37,23 +37,13 @@ export const deleteTask = async (taskId) => {
   }
 }
 
-export const updateTaskStatus = async (taskId) => {
+// Update task (supports partial updates)
+export const updateTask = async (taskId, updates) => {
   try {
-      const response = await axios.put(`${API_URL}/task/${taskId}`);
-      return response.data;
-  } catch (error) {
-      console.error("Error updating task status:", error);
-      throw error;
-  }
-};
-
-export const updateTask = async (task) => {
-  try {
-    const response = await axios.put(`${API_URL}/tasks/${task.id}`, task, { withCredentials: true });
+    const response = await axios.put(`${API_URL}/tasks/${taskId}`, updates, { withCredentials: true });
     return response.data;
   } catch (error) {
     console.error("Error updating task:", error);
     throw error;
   }
 };
-
