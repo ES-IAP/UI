@@ -14,7 +14,7 @@ import {
     Box
 } from "@mui/material";
 import { CheckCircle, Delete, Edit } from "@mui/icons-material";
-import { updateTaskStatus } from "../../services/taskService";
+import { updateTask } from "../../services/taskService";
 
 // Update the options according to your backend enum values
 const priorityOptions = ["low", "medium", "high"];
@@ -24,16 +24,16 @@ function TaskTable({ tasks, setTasks, handleDelete, handleEdit, setPriority, set
 
     async function handleToggleStatus(taskId) {
         try {
-            await updateTaskStatus(taskId); // Call backend to mark task as done
+            const updatedTask = await updateTask(taskId, { status: "done" });
             const updatedTasks = tasks.map((task) =>
-                task.id === taskId ? { ...task, status: 'done' } : task
+                task.id === taskId ? { ...task, status: updatedTask.status } : task
             );
-            setTasks(updatedTasks); // Update UI
+            setTasks(updatedTasks);
         } catch (error) {
             console.error("Failed to update task status:", error);
         }
-    }    
-
+    }
+       
 
     return (
         <TableContainer
