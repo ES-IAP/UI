@@ -1,14 +1,33 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const API_URL = "http://localhost:8000"; // Your backend URL
+
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      toast.error("Session expired. Redirecting to login.");
+      window.location.href = `${API_URL}/login`; // Redirect to login
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const login = () => {
   window.location.href = `${API_URL}/login`;
 };
 
 export const logout = async () => {
-  await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
+  try {
+    // Redirect user to the backend logout endpoint
+    window.location.href = `${API_URL}/logout`;
+  } catch (error) {
+    console.error("Error during logout:", error);
+    alert("Logout failed. Please try again.");
+  }
 };
+
 
 export const getCurrentUser = async () => {
   try {

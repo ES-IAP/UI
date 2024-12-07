@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {
     Table,
     TableBody,
@@ -13,8 +13,8 @@ import {
     MenuItem,
     Box
 } from "@mui/material";
-import { CheckCircle, Delete, Edit } from "@mui/icons-material";
-import { updateTaskStatus } from "../../services/taskService";
+import { CheckCircle, Delete, Edit, ArrowDropUp, ArrowDropDown } from "@mui/icons-material";
+import { updateTask } from "../../services/taskService";
 
 // Update the options according to your backend enum values
 const priorityOptions = ["low", "medium", "high"];
@@ -22,18 +22,44 @@ const statusOptions = ["to-do", "in progress", "done"];
 
 function TaskTable({ tasks, setTasks, handleDelete, handleEdit, setPriority, setStatus }) {
 
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+
     async function handleToggleStatus(taskId) {
         try {
-            await updateTaskStatus(taskId); // Call backend to mark task as done
+            const updatedTask = await updateTask(taskId, { status: "done" });
             const updatedTasks = tasks.map((task) =>
-                task.id === taskId ? { ...task, status: 'done' } : task
+                task.id === taskId ? { ...task, status: updatedTask.status } : task
             );
-            setTasks(updatedTasks); // Update UI
+            setTasks(updatedTasks);
         } catch (error) {
             console.error("Failed to update task status:", error);
         }
-    }    
+    }
 
+    const handleSort = (key) => {
+        let direction = "asc";
+        if (sortConfig.key === key && sortConfig.direction === "asc") {
+            direction = "desc";
+        }
+
+        const sortedTasks = [...tasks].sort((a, b) => {
+            if (key === "deadline" || key === "created_at") {
+                const dateA = new Date(a[key]);
+                const dateB = new Date(b[key]);
+                return direction === "asc" ? dateA - dateB : dateB - dateA;
+            } else if (key === "priority" || key === "status") {
+                return direction === "asc"
+                    ? a[key].localeCompare(b[key])
+                    : b[key].localeCompare(a[key]);
+            } else {
+                return direction === "asc" ? a[key] - b[key] : b[key] - a[key];
+            }
+        });
+
+        setSortConfig({ key, direction });
+        setTasks(sortedTasks);
+    };
+       
 
     return (
         <TableContainer
@@ -49,9 +75,36 @@ function TaskTable({ tasks, setTasks, handleDelete, handleEdit, setPriority, set
                 <TableHead>
                     <TableRow sx={{ backgroundColor: '#f5f7ff' }}>
                         <TableCell sx={{ fontWeight: 600, color: '#1a1a1a' }}>Task</TableCell>
-                        <TableCell sx={{ fontWeight: 600, color: '#1a1a1a' }}>Deadline</TableCell>
-                        <TableCell sx={{ fontWeight: 600, color: '#1a1a1a' }}>Priority</TableCell>
-                        <TableCell sx={{ fontWeight: 600, color: '#1a1a1a' }}>Status</TableCell>
+                        <TableCell sx={{ fontWeight: 600, color: '#1a1a1a' }}>
+                            Deadline
+                            <IconButton onClick={() => handleSort("deadline")}>
+                                {sortConfig.key === "deadline" && sortConfig.direction === "asc" ? (
+                                    <ArrowDropUp />
+                                ) : (
+                                    <ArrowDropDown />
+                                )}
+                            </IconButton>
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 600, color: '#1a1a1a' }}>
+                            Priority
+                            <IconButton onClick={() => handleSort("priority")}>
+                                {sortConfig.key === "priority" && sortConfig.direction === "asc" ? (
+                                    <ArrowDropUp />
+                                ) : (
+                                    <ArrowDropDown />
+                                )}
+                            </IconButton>
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 600, color: '#1a1a1a' }}>
+                            Status
+                            <IconButton onClick={() => handleSort("status")}>
+                                {sortConfig.key === "status" && sortConfig.direction === "asc" ? (
+                                    <ArrowDropUp />
+                                ) : (
+                                    <ArrowDropDown />
+                                )}
+                            </IconButton>
+                        </TableCell>
                         <TableCell sx={{ fontWeight: 600, color: '#1a1a1a' }}>Actions</TableCell>
                     </TableRow>
                 </TableHead>
