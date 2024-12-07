@@ -32,6 +32,8 @@ function TodoList() {
                 const fetchedTasks = await fetchTasks();
                 console.log("Fetched Tasks:", fetchedTasks); // Check the structure here
                 setTasks(fetchedTasks);
+            } else {
+                window.location.href = "/"; // Redirect to login if not logged in
             }
         };
         initializeUser();
