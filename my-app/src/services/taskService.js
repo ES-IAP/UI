@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Replace with your backend's base URL
-const API_URL = process.env.API_URL;
+const API_URL = process.env.REACT_APP_API_URL;
 
 axios.defaults.withCredentials = true; // Include credentials for Cognito
 

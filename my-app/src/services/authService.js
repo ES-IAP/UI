@@ -2,7 +2,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 
-const API_URL = process.env.API_URL; // Your backend URL
+const API_URL = process.env.REACT_APP_API_URL; // Your backend URL
+console.log(API_URL);
 
 axios.interceptors.response.use(
   (response) => response,
