@@ -1,7 +1,8 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const API_URL = "to-do-alb-1799795610.eu-north-1.elb.amazonaws.com:81"; // Your backend URL
+
+const API_URL = process.env.API_URL; // Your backend URL
 
 axios.interceptors.response.use(
   (response) => response,

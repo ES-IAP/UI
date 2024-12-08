@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Replace with your backend's base URL
-const API_URL = "to-do-alb-1799795610.eu-north-1.elb.amazonaws.com:81";
+const API_URL = process.env.API_URL;
 
 axios.defaults.withCredentials = true; // Include credentials for Cognito
 
