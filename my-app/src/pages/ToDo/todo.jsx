@@ -37,6 +37,8 @@ function TodoList() {
                 const fetchedTasks = await fetchTasks();
                 
                 setTasks(fetchedTasks);
+            } else {
+                window.location.href = "/"; // Redirect to login if not logged in
             }
         };
         initializeUser();

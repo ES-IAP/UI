@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Replace with your backend's base URL
-const API_URL = "http://localhost:8000";
+export const API_URL = import.meta.env.VITE_API_URL;
 
 axios.defaults.withCredentials = true; // Include credentials for Cognito
 
